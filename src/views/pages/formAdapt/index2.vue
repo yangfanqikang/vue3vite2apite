@@ -9,7 +9,7 @@
 <script lang="ts">
 import { toRefs, reactive } from "vue";
 
-import {getJSON, getTypeList} from "../../../api/menu";
+import {getJSON} from "../../../api/menu";
 export default {
   name: "formAdapt",
   // setup() {
@@ -59,15 +59,20 @@ export default {
       configData: {
         //
         columns: [
-          { defaultValue: '', prop: 'type', label: "公示类型", is: 'DBSelectGroup',list: [
-              {label: 'male', value: "男"},
-              {label: 'male', value: "男"},
-              {label: 'male', value: "男"},
-              {label: 'male', value: "男"},
-              {label: 'male', value: "男"},
-            ]
-          },
+          { defaultValue: '111', prop: "name", label: "借款人名称", is: "autocomplete"},
+          { defaultValue: '', prop: "certificateId", is: "input", label: "统一信用代码", rules: [{required: true, message: '请输入统一信用代码'}] },
           { defaultValue: '', prop: 'daterange', label: "日期范围", is: 'dateRangerPicker', },
+          { defaultValue: '', prop: 'date', label: "日期", is: 'datePicker', },
+          { defaultValue: '', prop: 'status', label: "状态", is: 'DBSelectGroup' },
+          { defaultValue: '', prop: 'currencyId', label: "币别", is: 'DBSelectGroup', list: [{label: 'male', value: "男"}, {label: 'famale', value: "女", disabled: true}] },   //异步获取字典项
+          { defaultValue: '', prop: "password", label: "密码", type: 'password',is: "input", },
+          { defaultValue: '', prop: "confimPass", label: "确认密码", type: 'password',is: "input",},
+          { defaultValue: '', prop: 'remark', label: "备注", type: 'textarea',is: "input", },
+          { defaultValue: '', prop: "email", label: "邮箱",is: "input" ,rules: [{ required: true, message: '请输入邮箱地址' }, { type: 'email', message: '请输入正确的邮箱地址' }] },
+          { defaultValue: '', prop: 'remember', label: '记住密码', is: 'checkbox' },
+          { defaultValue: '', prop: 'gender', label: '性别', is: 'DBRadioGroup', list: [{label: 'male', value: "男"}, {label: 'famale', value: "女", disabled: true}] },
+          { defaultValue: [], prop: 'love', label: '爱好', is: 'DBCheckboxGroup', list: [{label: '篮球', value: "0"}, {label: '排球', value: "1"}, {label: '足球', value: "2", disabled: true}] },
+          { defaultValue: '', prop: "delivery", label: "即时配送", is: 'switch' },
         ],
         // attrs: {
         //   span: 24,
@@ -76,11 +81,8 @@ export default {
     }
   },
   mounted (){
-    getTypeList().then((res: any) => {
+    getJSON().then((res: any) => {
       console.log(res)
-      if (res.result.code === 0){
-        this.configData.columns[0].list = res.result.data
-      }
       // callback(res)
     })
   },
