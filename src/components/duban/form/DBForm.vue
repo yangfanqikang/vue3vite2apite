@@ -5,8 +5,6 @@
         <el-form-item :label="x.label" :prop="x.prop">
           <component v-model="form[x.prop]" v-bind="componentAttrs(x)" :is="TYPE[x.is].is" />
         </el-form-item>
-<!--        <p>x&#45;&#45;{{x}}</p>-->
-<!--        <p>is=>{{TYPE[x.is].is || (x.label + '>>>>>>>>>') }}</p>-->
       </el-col>
     </el-row>
     <div class="searchBtn" v-if="footer">
@@ -17,14 +15,12 @@
 </template>
 
 <script>
-// import { fromEntries } from '@/utils'
-import { h, getCurrentInstance } from 'vue'
 import _ from 'lodash'
 import DBSelectGroup from "./DBSelectGroup.vue";
 import DBCheckboxGroup from "./DBCheckboxGroup.vue";
 import DBRadioGroup from "./DBRadioGroup.vue";
 export default {
-  name: 'DBForm2',
+  name: 'DBForm',
   props: {
     config: Object,
   },
@@ -63,7 +59,9 @@ export default {
         },
         dateRangerPicker: {
           is: 'el-date-picker',
+          'v-date-format': true,
           type:"daterange",
+          "value-format":"yyyy-MM-dd",
           "range-separator":"至",
           "start-placeholder":"开始日期",
           "end-placeholder":"结束日期",  //文本框是否可输入，默认为true可输入
@@ -71,6 +69,7 @@ export default {
         datePicker: {
           is: 'el-date-picker',
           type: "date",
+          "value-format":"yyyy-MM-dd",
         },
         autocomplete: {
           is: 'el-autocomplete'
@@ -134,8 +133,6 @@ export default {
       !this.footer && this.$refs.form.validate(valid => valid && cb(this.form));
       // 第二种情况
       this.footer && this.$refs.form.validate(valid => valid && this.$emit('submit', this.form));
-      console.log(this.form)
-      debugger;
     },
   }
 }

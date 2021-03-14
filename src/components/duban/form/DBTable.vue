@@ -1,7 +1,9 @@
 <template>
-  <div>
-    <el-table :data="cfg.data" style="width: 100%" v-on="cfg.on" v-bind="attrs" v-loading="loading">
-      <el-table-column v-if="cfg.hasCheckbox" v-bind="selectionAttrs" type="selection" width="55" label="xx" />
+  <div class="db-table">
+    <el-table :data="cfg.data" style="width: 100%" v-on="cfg.on" v-bind="attrs" v-loading="loading" @row-dblclick="rowDblClick">
+      <el-table-column v-if="cfg.hasCheckbox" v-bind="selectionAttrs" type="selection" width="39" label="xx" />
+      <el-table-column label="序号" type="index" show-overflow-tooltip width="50" v-if="cfg.hasIndex">
+      </el-table-column>
       <el-table-column v-for="n in cfg.headers" :prop="n.prop" :label="n.label" :key="n.prop" v-bind="{...columnAttrs, ...n.attrs}">
         <template v-slot="{row}">
           <slot :name="n.prop" :row="row"><Cell :config="n" :data="row" /></slot>
@@ -12,7 +14,7 @@
         class="pagination"
         v-if="showPage"
         layout="total, sizes, prev, pager, next, jumper"
-        :page-sizes="[2, 3, 6, 11]"
+        :page-sizes="[10,30,50]"
         :page-size="page.size"
         :total="page.total"
         :current-page="page.page"
@@ -23,6 +25,7 @@
 </template>
 
 <script>
+// todo 处理序号,索引
 import Cell from './cell.vue'
 
 export default {
@@ -34,6 +37,7 @@ export default {
     config: Object,
   },
   data(){
+    const config = this.config
     return {
       loading: true,
       columnAttrs: {
@@ -48,13 +52,14 @@ export default {
         },
         data: [],
         ...this.config,
+        headers: config.actions ? config.headers.concat(config.actions) : config.headers,
       },
       page: {
         size: this.config.size || 10,
         page: 1,
         total: 0,
       },
-      checked: [],
+      checked: []
     }
   },
   created(){
@@ -92,7 +97,6 @@ export default {
           'row-key': rowKey,
         })
       }
-
       return attrs;
     },
     showPage(){
@@ -101,6 +105,10 @@ export default {
     },
   },
   methods: {
+    // 双击
+    rowDblClick(val){
+      this.$emit('rowDblClick', val)
+    },
     getTableEvents(){
       let {hasCheckbox = false} = this.config || {}, events = {}, _this = this;
       if(hasCheckbox){
@@ -108,10 +116,9 @@ export default {
         Object.assign(events, {
           'selection-change'(v){
             _this.checked = v;
-          },
+          }
         });
       }
-
       return events;
     },
     // 获取勾选的行
@@ -123,7 +130,9 @@ export default {
       let { size, page } = this.page, {loadData = () => Promise.resolve({})} = this.config;
       this.loading = true;
       // 这里loadData的参数在初始化时只有分页所需的page和size，至于接口需要的其他参数，是在父组件的loadData中传递
-      loadData({...p, page, size}).then(({data, total}) => {
+      loadData({...p, page, size}).then((res) => {
+        console.log(res)
+        let {data, total,page} = res.result
         this.cfg.data = data;
         this.page.page = page;
         this.page.total = total;
@@ -146,3 +155,8 @@ export default {
   },
 }
 </script>
+<style lang="scss">
+.db-table{
+  box-sizing: initial;
+}
+</style>

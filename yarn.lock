@@ -326,7 +326,7 @@
   "resolved" "https://registry.npm.taobao.org/date-fns/download/date-fns-2.19.0.tgz"
   "version" "2.19.0"
 
-"dayjs@1.x":
+"dayjs@^1.10.4", "dayjs@1.x":
   "integrity" "sha1-jlRKm4aD9heD9XCYCoqA6vVKseI="
   "resolved" "https://registry.npm.taobao.org/dayjs/download/dayjs-1.10.4.tgz"
   "version" "1.10.4"

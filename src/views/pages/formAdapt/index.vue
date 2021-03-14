@@ -1,15 +1,16 @@
 <template>
   <div class="form-adapt-container">
 <!--    <DBForm :config="config" ref="table" ></DBForm>-->
-    <DBForm :config="configData"></DBForm>
-    <DBTable :config="config" ref="table" ></DBTable>
+    <DBForm :config="configData" @submit="submit"></DBForm>
+    <DBTable :config="config" ref="table" @rowDblClick="rowDblClick"></DBTable>
   </div>
 </template>
 
 <script lang="ts">
 import { toRefs, reactive } from "vue";
-
-import {getJSON, getTypeList} from "../../../api/menu";
+import dayjs from 'dayjs'
+import {getQueryData, getTypeList} from "../../../api/menu";
+import {getActions, getTHeaders} from "../../../components/duban/form/const";
 export default {
   name: "formAdapt",
   // setup() {
@@ -24,49 +25,22 @@ export default {
 
     return {
       config: {
-        headers: [
-          {prop: 'contractCode', label: '业务编号', attrs: {width: 200, align: 'center'}},
-          {prop: 'payeeAcctName', label: '收款账户名', attrs: {width: 260, align: 'right'}},
-          {prop: 'tradeAmt', label: '付款金额'},
-          // {prop: 'status', label: '操作状态', type: 'Enum', Enum: {name: 'order'}},
-          {prop: 'statistic', label: '预警统计'},
-          {prop: 'payTime', label: '付款时间'},
-          {prop: 'reason', label: '原因'},
-          // {prop: 'monitorStatus', label: '当前监控状态', type: 'Enum', Enum: {name: 'monitor'}},
-          // {prop: 'customize', label: '自定义展示', type: 'Format', format: val => this.customize(val)},
-          {prop: 'opt', label: '操作'},
-        ],
-        loadData: () => Promise.resolve({
-          data: [
-            {id: 1, contractCode: '', payeeAcctName: '中国银行上海分行', tradeAmt: '503869.265', status: '00', payTime: 1593585652530,
-              statistic:[
-                {level: 3, total: 5},
-                {level: 2, total: 7},
-                {level: 1, total: 20},
-                {level: 0, total: 0}
-              ],
-              customize: ['中国', '上海', '浦东新区']
-            },
-            {id: 2, contractCode: 'GLP-YG-B3-1111', payeeAcctName: '中国邮政上海分行', tradeAmt: '78956.85', status: 'CREATED', payTime: 1593416718317,
-              reason: 'Popover的属性与Tooltip很类似，它们都是基于Vue-popper开发的，因此对于重复属性，请参考Tooltip的文档，在此文档中不做详尽解释。',
-            },
-            {id: 3, contractCode: 'HT1592985730310', payeeAcctName: '招商银行上海支行', tradeAmt: '963587123', status: 'PASS', payTime: 1593420950772, monitorStatus: '01'},
-            {id: 4, contractCode: 'pi239', payeeAcctName: '广州物流有限公司', tradeAmt: '875123966', status: 'REJECT', payTime: 1593496609363},
-            {id: 5, contractCode: '0701001', payeeAcctName: '建设银行上海分账', tradeAmt: '125879125', status: 'REFUSE', payTime: 1593585489177},
-          ],
-        }),
+        headers: getTHeaders(['type','time', 'content']),
+        loadData: p => getQueryData({...this.setParams(), ...p}),
+        hasCheckbox: true,
+        hasIndex: true,
+        selectable: this.selectable,
+        reserveSelection: false,
+        rowKey: row => row.id,
+        on: {
+          // click: this.rowDblClick,
+        },
+        actions: getActions(['action1','action2'])
       },
       configData: {
         //
         columns: [
-          { defaultValue: '', prop: 'type', label: "公示类型", is: 'DBSelectGroup',list: [
-              {label: 'male', value: "男"},
-              {label: 'male', value: "男"},
-              {label: 'male', value: "男"},
-              {label: 'male', value: "男"},
-              {label: 'male', value: "男"},
-            ]
-          },
+          { defaultValue: '', prop: 'type', label: "公示类型", is: 'DBSelectGroup',list: []},
           { defaultValue: '', prop: 'daterange', label: "日期范围", is: 'dateRangerPicker', },
         ],
         // attrs: {
@@ -76,16 +50,48 @@ export default {
     }
   },
   mounted (){
-    getTypeList().then((res: any) => {
-      console.log(res)
-      if (res.result.code === 0){
-        this.configData.columns[0].list = res.result.data
-      }
-      // callback(res)
-    })
+    this.getType()
+    // this.getTableData()
+
   },
   methods: {
-
+    getChecked(){
+      console.log(this.$refs.table.getChecked())
+    },
+    // 设置是否禁用
+    selectable(item){
+      // this.$message.success('aslkdjfalksdjflk;asdf')
+      return true
+    },
+    getType(){
+      getTypeList().then((res: any) => {
+        if (res.code === 0){
+          this.configData.columns[0].list = res.result.data
+        }
+        // callback(res)
+      })
+    },
+    rowDblClick(val){
+      this.$message.success(JSON.stringify(val))
+    },
+    setParams(item){
+      // console.log(dayjs(item?.daterange[0].getTime(), 'YYYY-MM-DD hh:mm:ss'));
+      console.log(dayjs(item?.daterange[0].toISOString()).format('YYYY-MM-DD hh:mm:ss'))
+      // 所需要的参数
+      return {
+        type: item?.type || '',
+        start: item?.start ||  "",
+        end: item?.end || '',
+      }
+    },
+    submit(val){
+      console.log(val)
+      // 设置请求的参数
+      this.setParams(val)
+      console.log(val)
+      // 触发请求
+      this.$refs.table.loadPage(1)
+    }
   }
 };
 </script>
