@@ -1,7 +1,9 @@
 <template>
   <div class="form-adapt-container">
+    <el-button type="primary" @click="getChecked">buttonCont</el-button>
 <!--    <DBForm :config="config" ref="table" ></DBForm>-->
-    <DBForm :config="configData" @submit="submit"></DBForm>
+    <DBForm :config="configData" ref="form"></DBForm>
+    <el-button type="primary" @click="submit">buttonCont</el-button>
     <DBTable :config="config" ref="table" @rowDblClick="rowDblClick"></DBTable>
   </div>
 </template>
@@ -35,6 +37,11 @@ export default {
         on: {
           // click: this.rowDblClick,
         },
+        onEvents: {
+          rowDblclick: this.rowDblclick2,
+          sortChange: this.sortChange,
+          selectionChange: this.selectionChange
+        },
         actions: getActions(['action1','action2'])
       },
       configData: {
@@ -55,6 +62,17 @@ export default {
 
   },
   methods: {
+    selectionChange(v){
+      console.log(v)
+      // console.log(this.$refs.table.getChecked())
+      debugger
+    },
+    rowDblclick2(val){
+      console.log(val)
+    },
+    sortChange(val){
+      console.log(val)
+    },
     getChecked(){
       console.log(this.$refs.table.getChecked())
     },
@@ -74,23 +92,22 @@ export default {
     rowDblClick(val){
       this.$message.success(JSON.stringify(val))
     },
-    setParams(item){
-      // console.log(dayjs(item?.daterange[0].getTime(), 'YYYY-MM-DD hh:mm:ss'));
-      console.log(dayjs(item?.daterange[0].toISOString()).format('YYYY-MM-DD hh:mm:ss'))
+    setParams(){
       // 所需要的参数
+      // this.$nextTick(() =>{
+      //   return this.$refs.form.form
+      // })
       return {
-        type: item?.type || '',
-        start: item?.start ||  "",
-        end: item?.end || '',
+        type: '',
+        daterange: ''
       }
     },
-    submit(val){
+    submit(val) {
       console.log(val)
       // 设置请求的参数
-      this.setParams(val)
-      console.log(val)
+      this.setParams()
       // 触发请求
-      this.$refs.table.loadPage(1)
+      this.$refs.table.load(this.$refs.form.form)
     }
   }
 };

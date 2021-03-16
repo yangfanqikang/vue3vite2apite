@@ -10,7 +10,7 @@ const init = [
 ]
 
 const tHeader = [
-    {prop: 'time', label: '时间', attrs: {width: 160}},
+    {prop: 'time', label: '时间', sortable: 'custom' , attrs: {width: 160}},
     {prop: 'type', label: '类型', attrs: {width: 100}},
     {prop: 'content', label: '公示内容'}
 ]
