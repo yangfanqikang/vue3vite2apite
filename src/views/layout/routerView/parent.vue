@@ -2,9 +2,9 @@
   <div class="h100">
     <router-view v-slot="{ Component }">
       <transition :name="setTransitionName" mode="out-in">
-        <keep-alive :include="getKeepAliveNames">
+<!--        <keep-alive :include="getKeepAliveNames">-->
           <component :is="Component" :key="refreshRouterViewKey" class="w100" />
-        </keep-alive>
+<!--        </keep-alive>-->
       </transition>
     </router-view>
   </div>
@@ -77,4 +77,3 @@ export default defineComponent({
 });
 </script>
 
-  

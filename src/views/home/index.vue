@@ -94,13 +94,13 @@
 </template>
 
 <script lang="ts">
-import { toRefs, reactive, onMounted, nextTick, computed } from "vue";
-import * as echarts from "echarts";
-import { CountUp } from "countup.js";
-import { formatAxis } from "/@/utils/formatTime";
-import { topCardItemList, environmentList, activitiesList } from "./mock.ts";
+import { toRefs, reactive, onMounted, nextTick, computed } from 'vue'
+import * as echarts from 'echarts'
+import { CountUp } from 'countup.js'
+import { formatAxis } from '/@/utils/formatTime'
+import { topCardItemList, environmentList, activitiesList } from './mock.ts'
 export default {
-  name: "home",
+  name: 'home',
   setup() {
     const state = reactive({
       topCardItemList,
@@ -109,161 +109,161 @@ export default {
       tableData: {
         data: [
           {
-            date: "2016-05-02",
-            name: "1号实验室",
-            address: "烟感2.1%OBS/M",
+            date: '2016-05-02',
+            name: '1号实验室',
+            address: '烟感2.1%OBS/M'
           },
           {
-            date: "2016-05-04",
-            name: "2号实验室",
-            address: "温度30℃",
+            date: '2016-05-04',
+            name: '2号实验室',
+            address: '温度30℃'
           },
           {
-            date: "2016-05-01",
-            name: "3号实验室",
-            address: "湿度57%RH",
-          },
-        ],
-      },
-    });
+            date: '2016-05-01',
+            name: '3号实验室',
+            address: '湿度57%RH'
+          }
+        ]
+      }
+    })
     // 当前时间提示语
     const currentTime = computed(() => {
-      return formatAxis(new Date());
-    });
+      return formatAxis(new Date())
+    })
     // 初始化数字滚动
     const initNumCountUp = () => {
       nextTick(() => {
-        new CountUp("titleNum1", Math.random() * 10000).start();
-        new CountUp("titleNum2", Math.random() * 10000).start();
-        new CountUp("titleNum3", Math.random() * 10000).start();
-        new CountUp("tipNum1", Math.random() * 1000).start();
-        new CountUp("tipNum2", Math.random() * 1000).start();
-        new CountUp("tipNum3", Math.random() * 1000).start();
-      });
-    };
+        new CountUp('titleNum1', Math.random() * 10000).start()
+        new CountUp('titleNum2', Math.random() * 10000).start()
+        new CountUp('titleNum3', Math.random() * 10000).start()
+        new CountUp('tipNum1', Math.random() * 1000).start()
+        new CountUp('tipNum2', Math.random() * 1000).start()
+        new CountUp('tipNum3', Math.random() * 1000).start()
+      })
+    }
     // 实验室使用情况
     const initHomeLaboratory = () => {
-      const myChart = echarts.init(document.getElementById("homeLaboratory"));
+      const myChart = echarts.init(document.getElementById('homeLaboratory'))
       const option = {
         grid: {
           top: 50,
           right: 20,
           bottom: 30,
-          left: 30,
+          left: 30
         },
         tooltip: {
-          trigger: "axis",
+          trigger: 'axis'
         },
         legend: {
-          data: ["预购队列", "最新成交价"],
-          right: 13,
+          data: ['预购队列', '最新成交价'],
+          right: 13
         },
         xAxis: {
-          data: ["衬衫", "羊毛衫", "雪纺衫", "裤子", "高跟鞋", "袜子"],
+          data: ['衬衫', '羊毛衫', '雪纺衫', '裤子', '高跟鞋', '袜子']
         },
         yAxis: [
           {
-            type: "value",
-            name: "价格",
-          },
+            type: 'value',
+            name: '价格'
+          }
         ],
         series: [
           {
-            name: "预购队列",
-            type: "bar",
-            data: [5, 20, 36, 10, 10, 20],
+            name: '预购队列',
+            type: 'bar',
+            data: [5, 20, 36, 10, 10, 20]
           },
           {
-            name: "最新成交价",
-            type: "line",
-            data: [15, 20, 16, 20, 30, 8],
-          },
-        ],
-      };
-      myChart.setOption(option);
-      window.addEventListener("resize", () => {
-        myChart.resize();
-      });
-    };
+            name: '最新成交价',
+            type: 'line',
+            data: [15, 20, 16, 20, 30, 8]
+          }
+        ]
+      }
+      myChart.setOption(option)
+      window.addEventListener('resize', () => {
+        myChart.resize()
+      })
+    }
     // 履约超时预警
     const initHomeOvertime = () => {
-      const myChart = echarts.init(document.getElementById("homeOvertime"));
+      const myChart = echarts.init(document.getElementById('homeOvertime'))
       const option = {
         grid: {
           top: 50,
           right: 20,
           bottom: 30,
-          left: 30,
+          left: 30
         },
         tooltip: {
-          trigger: "axis",
+          trigger: 'axis'
         },
         legend: {
-          data: ["订单数量", "超时数量", "在线数量", "预警数量"],
-          right: 13,
+          data: ['订单数量', '超时数量', '在线数量', '预警数量'],
+          right: 13
         },
         xAxis: {
           data: [
-            "1月",
-            "2月",
-            "3月",
-            "4月",
-            "5月",
-            "6月",
-            "7月",
-            "8月",
-            "9月",
-            "10月",
-            "11月",
-            "12月",
-          ],
+            '1月',
+            '2月',
+            '3月',
+            '4月',
+            '5月',
+            '6月',
+            '7月',
+            '8月',
+            '9月',
+            '10月',
+            '11月',
+            '12月'
+          ]
         },
         yAxis: [
           {
-            type: "value",
-            name: "数量",
-          },
+            type: 'value',
+            name: '数量'
+          }
         ],
         series: [
           {
-            name: "订单数量",
-            type: "bar",
-            data: [5, 20, 36, 10, 10, 20, 11, 13, 10, 9, 17, 19],
+            name: '订单数量',
+            type: 'bar',
+            data: [5, 20, 36, 10, 10, 20, 11, 13, 10, 9, 17, 19]
           },
           {
-            name: "超时数量",
-            type: "bar",
-            data: [15, 12, 26, 15, 11, 16, 31, 13, 5, 16, 13, 15],
+            name: '超时数量',
+            type: 'bar',
+            data: [15, 12, 26, 15, 11, 16, 31, 13, 5, 16, 13, 15]
           },
           {
-            name: "在线数量",
-            type: "line",
-            data: [15, 20, 16, 20, 30, 8, 16, 19, 12, 18, 19, 14],
+            name: '在线数量',
+            type: 'line',
+            data: [15, 20, 16, 20, 30, 8, 16, 19, 12, 18, 19, 14]
           },
           {
-            name: "预警数量",
-            type: "line",
-            data: [10, 10, 13, 12, 15, 18, 19, 10, 12, 15, 11, 17],
-          },
-        ],
-      };
-      myChart.setOption(option);
-      window.addEventListener("resize", () => {
-        myChart.resize();
-      });
-    };
+            name: '预警数量',
+            type: 'line',
+            data: [10, 10, 13, 12, 15, 18, 19, 10, 12, 15, 11, 17]
+          }
+        ]
+      }
+      myChart.setOption(option)
+      window.addEventListener('resize', () => {
+        myChart.resize()
+      })
+    }
     // 页面加载时
     onMounted(() => {
-      initNumCountUp();
-      initHomeLaboratory();
-      initHomeOvertime();
-    });
+      initNumCountUp()
+      initHomeLaboratory()
+      initHomeOvertime()
+    })
     return {
       currentTime,
-      ...toRefs(state),
-    };
-  },
-};
+      ...toRefs(state)
+    }
+  }
+}
 </script>
 
 <style scoped lang="scss">

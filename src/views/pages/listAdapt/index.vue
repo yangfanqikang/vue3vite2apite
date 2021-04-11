@@ -1,168 +1,362 @@
 <template>
-  <div class="list-adapt-container">
-    <el-card shadow="hover" header="列表自适应演示(改变窗口查看效果)">
-      <div class="flex-warp" v-if="tableData.data.length > 0">
-        <el-row :gutter="15">
-          <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="4" class="mb15" v-for="(v,k) in tableData.data" :key="k"
-            @click="onTableItemClick(v)">
-            <div class="flex-warp-item">
-              <div class="flex-warp-item-box">
-                <div class="item-img">
-                  <img :src="v.img" />
-                </div>
-                <div class="item-txt">
-                  <div class="item-txt-title">{{v.title}}</div>
-                  <div class="item-txt-other">
-                    <div style="width: 100%;">
-                      <div class="item-txt-msg mb10">
-                        <span>评价 {{v.evaluate}}</span>
-                        <span class="ml10">收藏 {{v.collection}}</span>
-                      </div>
-                      <div class="item-txt-msg item-txt-price">
-                        <span class="font-price">
-                          <span>￥</span>
-                          <span class="font">{{v.price}}</span>
-                        </span>
-                        <span>月销{{v.monSales}}笔</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </el-col>
-        </el-row>
-      </div>
-      <el-empty v-else description="暂无数据"></el-empty>
-      <template v-if="tableData.data.length > 0">
-        <el-pagination style="text-align: right;" background @size-change="onHandleSizeChange"
-          @current-change="onHandleCurrentChange" :page-sizes="[10, 20, 30]" :current-page="tableData.param.pageNum"
-          :page-size="tableData.param.pageSize" layout="total, sizes, prev, pager, next, jumper"
-          :total="tableData.total">
-        </el-pagination>
-      </template>
-    </el-card>
+  <div class="grid-container" :style="JSONData.styleVars">
+    <div class="grid-box" v-for="(item,index) in JSONData.list" :key="item.sort" :style="item.style">
+      <div>{{item.componentName}}--{{index}}</div>
+      <span class="resize" ref="resize" @mousedown.stop="e=>handleMouseDown(e,1,item)">▶</span>
+      <span class="vresize" ref="resize" @mousedown.stop="e=>handleMouseDown(e,2,item)">▼</span>
+    </div>
   </div>
+  <pre>{{JSON.stringify(JSONData.list, null, 4)}}</pre>
 </template>
-
-<script lang="ts">
-import { toRefs, reactive } from "vue";
-import { filterList } from "./mock.ts";
+<script>
+import { ref, reactive, nextTick } from 'vue'
+import _ from 'lodash'
 export default {
-  name: "listAdapt",
+  name: 'grid-container',
   setup() {
-    const state = reactive({
-      tableData: {
-        data: filterList,
-        total: 99,
-        loading: false,
-        param: {
-          pageNum: 1,
-          pageSize: 10,
-        },
+    const JSONData = reactive({
+      // css变量
+      styleVars: {
+        // 纵向排列大小,是用比例做还是数值做,思考一下,默认为1fr
+        // '--gridTemplateColumns': '100px 200px',
+        '--gridTemplateColumns': 'repeat(12, 1fr)',
+        // '--gridAutoColumns': 'minmax(36px, auto)',
+        // 默认行高
+        '--gridAutoRows': '50px',
+        // 默认间距
+        '--gridGap': '1px'
       },
-    });
-    // 分页点击
-    const onHandleSizeChange = (val) => {
-      state.tableData.param.pageSize = val;
-    };
-    // 分页点击
-    const onHandleCurrentChange = (val) => {
-      state.tableData.param.pageNum = val;
-    };
-    return {
-      onHandleSizeChange,
-      onHandleCurrentChange,
-      ...toRefs(state),
-    };
-  },
-};
-</script>
-
-<style scoped lang="scss">
-.flex-warp {
-  display: flex;
-  flex-wrap: wrap;
-  align-content: flex-start;
-  margin: 0 -5px;
-  .flex-warp-item {
-    padding: 5px;
-    width: 100%;
-    height: 360px;
-    .flex-warp-item-box {
-      border: 1px solid #ebeef5;
-      width: 100%;
-      height: 100%;
-      border-radius: 2px;
-      display: flex;
-      flex-direction: column;
-      transition: all 0.3s ease;
-      &:hover {
-        cursor: pointer;
-        border: 1px solid var(--color-primary);
-        transition: all 0.3s ease;
-        box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.03);
-        .item-txt-title {
-          color: var(--color-primary) !important;
-          transition: all 0.3s ease;
-        }
-        .item-img {
-          img {
-            transition: all 0.3s ease;
-            transform: translateZ(0) scale(1.05);
+      list: [
+        {
+          gridRowEnd: 'span 2',
+          sort: 0,
+          componentName: '下拉列表',
+          style: {
+            // 行偏移2格
+            gridRowEnd: 'span 2',
+            // 列偏移2格
+            gridColumnEnd: 'span 2'
+            // height: '30px'
+          }
+        },
+        {
+          sort: 1,
+          componentName: '表单',
+          style: {
+            gridRowEnd: 'span 2',
+            // 列偏移2格
+            gridColumnEnd: 'span 2'
+          }
+        },
+        {
+          sort: 2,
+          componentName: '表单',
+          style: {
+            gridRowEnd: 'span 1',
+            // 列偏移2格
+            gridColumnEnd: 'span 1'
+          }
+        },
+        {
+          sort: 2,
+          componentName: '表单',
+          style: {
+            gridRowEnd: 'span 1',
+            // 列偏移2格
+            gridColumnEnd: 'span 1'
+          }
+        },
+        {
+          sort: 2,
+          componentName: '表单',
+          style: {
+            gridRowEnd: 'span 1',
+            // 列偏移2格
+            gridColumnEnd: 'span 1'
+          }
+        },
+        {
+          sort: 2,
+          componentName: '表单',
+          style: {
+            gridRowEnd: 'span 1',
+            // 列偏移2格
+            gridColumnEnd: 'span 1'
+          }
+        },
+        {
+          sort: 2,
+          componentName: '表单',
+          style: {
+            gridRowEnd: 'span 1',
+            // 列偏移2格
+            gridColumnEnd: 'span 1'
+          }
+        },
+        {
+          sort: 2,
+          componentName: '表单',
+          style: {
+            gridRowEnd: 'span 1',
+            // 列偏移2格
+            gridColumnEnd: 'span 1'
+          }
+        },
+        {
+          sort: 2,
+          componentName: '表单',
+          style: {
+            gridRowEnd: 'span 1',
+            // 列偏移2格
+            gridColumnEnd: 'span 1'
+          }
+        },
+        {
+          sort: 2,
+          componentName: '表单',
+          style: {
+            gridRowEnd: 'span 1',
+            // 列偏移2格
+            gridColumnEnd: 'span 1'
+          }
+        },
+        {
+          sort: 2,
+          componentName: '表单',
+          style: {
+            gridRowEnd: 'span 1',
+            // 列偏移2格
+            gridColumnEnd: 'span 1'
+          }
+        },
+        {
+          sort: 2,
+          componentName: '表单',
+          style: {
+            gridRowEnd: 'span 1',
+            // 列偏移2格
+            gridColumnEnd: 'span 1'
+          }
+        },
+        {
+          sort: 2,
+          componentName: '表单',
+          style: {
+            gridRowEnd: 'span 1',
+            // 列偏移2格
+            gridColumnEnd: 'span 1'
+          }
+        },
+        {
+          sort: 2,
+          componentName: '表单',
+          style: {
+            gridRowEnd: 'span 1',
+            // 列偏移2格
+            gridColumnEnd: 'span 1'
+          }
+        },
+        {
+          sort: 2,
+          componentName: '表单',
+          style: {
+            gridRowEnd: 'span 1',
+            // 列偏移2格
+            gridColumnEnd: 'span 1'
+          }
+        },
+        {
+          sort: 2,
+          componentName: '表单',
+          style: {
+            gridRowEnd: 'span 1',
+            // 列偏移2格
+            gridColumnEnd: 'span 1'
+          }
+        },
+        {
+          sort: 2,
+          componentName: '表单',
+          style: {
+            gridRowEnd: 'span 1',
+            // 列偏移2格
+            gridColumnEnd: 'span 1'
+          }
+        },
+        {
+          sort: 2,
+          componentName: '表单',
+          style: {
+            gridRowEnd: 'span 1',
+            // 列偏移2格
+            gridColumnEnd: 'span 1'
+          }
+        },
+        {
+          sort: 2,
+          componentName: '表单',
+          style: {
+            gridRowEnd: 'span 1',
+            // 列偏移2格
+            gridColumnEnd: 'span 1'
+          }
+        },
+        {
+          sort: 2,
+          componentName: '表单',
+          style: {
+            gridRowEnd: 'span 1',
+            // 列偏移2格
+            gridColumnEnd: 'span 1'
+          }
+        },
+        {
+          sort: 2,
+          componentName: '表单',
+          style: {
+            gridRowEnd: 'span 1',
+            // 列偏移2格
+            gridColumnEnd: 'span 1'
           }
         }
+      ]
+    })
+    const isDown = ref(false)
+    const position = reactive({
+      startX: 0,
+      endX: 0,
+      startY: 0,
+      endY: 0
+    })
+    let lock = false
+    const handleMouseDown = (e, type, item) => {
+      // e.target.style.background = 'green'
+      lock = false
+      if (type === 1) {
+        position.startX = e.clientX
+        console.log('>>>position.startX', position.startX)
+      } else {
+        position.startY = e.clientY
+        console.log('>>>', position.startY)
       }
-      .item-img {
-        width: 100%;
-        height: 215px;
-        overflow: hidden;
-        img {
-          transition: all 0.3s ease;
-          width: 100%;
-          height: 100%;
+      document.onmousemove = (e) => {
+        lock = true
+        if (type === 1) {
+          position.endX = e.clientX
+          console.log('endX', position.endX)
+        } else {
+          position.endY = e.clientY
+          console.log('endY', position.endY)
         }
+        createElementDiv(e, type)
       }
-      .item-txt {
-        flex: 1;
-        padding: 15px;
-        display: flex;
-        flex-direction: column;
-        overflow: hidden;
-        .item-txt-title {
-          text-overflow: ellipsis;
-          overflow: hidden;
-          -webkit-line-clamp: 2;
-          -webkit-box-orient: vertical;
-          display: -webkit-box;
-          color: #666666;
-          transition: all 0.3s ease;
-          &:hover {
-            color: var(--color-primary);
-            text-decoration: underline;
-            transition: all 0.3s ease;
+      document.onmouseup = () => {
+        document.onmousemove = null
+        document.onmouseup = null
+        if (lock) {
+          if (document.querySelector('#_line')) {
+            document.body.removeChild(document.querySelector('#_line'))
           }
-        }
-        .item-txt-other {
-          flex: 1;
-          align-items: flex-end;
-          display: flex;
-          .item-txt-msg {
-            font-size: 12px;
-            color: #8d8d91;
-          }
-          .item-txt-price {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            .font-price {
-              color: #ff5000;
-              .font {
-                font-size: 22px;
-              }
+          if (type === 1) {
+            // 右侧拖拽
+            const moveLength = position.endX - position.startX
+            if (Math.abs(moveLength) < 10) return
+            console.log('moveLength', moveLength)
+            const moveCount = Math.abs(parseInt(moveLength / 50)) > 0 ? parseInt(moveLength / 50) : (moveLength > 0 ? 1 : -1)
+            console.log('moveCount', moveCount)
+            // 最大12和最小1宽度限制
+            const count = item.style.gridColumnEnd.split(' ')[1] * 1 + moveCount
+            if (count <= 1) {
+              item.style.gridColumnEnd = 'span 1'
+            } else if (count >= 12) {
+              item.style.gridColumnEnd = 'span 12'
+            } else {
+              item.style.gridColumnEnd = 'span ' + (item.style.gridColumnEnd.split(' ')[1] * 1 + moveCount)
+            }
+          } else {
+            const moveLength = position.endY - position.startY
+            if (Math.abs(moveLength) < 15) return
+            // 下侧拖拽
+            console.log('moveLength>>>', moveLength)
+            const moveCount = Math.abs(parseInt(moveLength / 50)) > 0 ? parseInt(moveLength / 50) : (moveLength > 0 ? 1 : -1)
+            console.log('moveCount', moveCount)
+            const count = item.style.gridRowEnd.split(' ')[1] * 1 + moveCount
+            if (count <= 1) {
+              item.style.gridRowEnd = 'span 1'
+            } else {
+              item.style.gridRowEnd = 'span ' + (item.style.gridRowEnd.split(' ')[1] * 1 + moveCount)
             }
           }
         }
+      }
+    }
+
+    const createElementDiv = (e, type) => {
+      if (document.querySelector('#_line')) {
+        document.body.removeChild(document.querySelector('#_line'))
+      } else {
+        const cDiv = document.createElement('div')
+        cDiv.style.position = 'fixed'
+        if (type === 1) {
+          cDiv.style.left = e.clientX + 'px'
+          cDiv.style.top = '0'
+          cDiv.style.height = '100%'
+          cDiv.style.borderRight = '1px dashed green'
+        } else {
+          cDiv.style.top = e.clientY + 'px'
+          cDiv.style.left = '0'
+          cDiv.style.width = '100%'
+          cDiv.style.borderTop = '1px dashed green'
+        }
+
+        cDiv.style.zIndex = '10'
+        cDiv.id = '_line'
+        document.body.appendChild(cDiv)
+      }
+    }
+
+    return {
+      handleMouseDown,
+      isDown,
+      JSONData
+    }
+  }
+}
+</script>
+<style scoped lang="scss">
+.grid-container {
+  width: 865px;
+  user-select: none;
+  display: grid;
+  grid-template-columns: var(--gridTemplateColumns);
+  grid-auto-columns: var(--gridAutoColumns);
+  // 默认行高50px
+  grid-auto-rows: var(--gridAutoRows);
+  grid-gap: var(--gridGap);
+  border: 2px solid red;
+  background-color: red;
+  >div{
+    background-color: #fff;
+    position: relative;
+    >.resize{
+      position: absolute;
+      top: 0;
+      right: 0;
+      &:hover{
+        color: red;
+        cursor: w-resize;
+      }
+    }
+    .vresize{
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      height: 100%;
+      display: grid;
+      align-items: end;
+      &:hover{
+        color: red;
+        cursor: n-resize;
       }
     }
   }

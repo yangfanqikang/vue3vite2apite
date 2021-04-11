@@ -9,7 +9,6 @@
 <script lang="ts">
 import { toRefs, reactive } from "vue";
 
-import {getJSON} from "../../../api/menu";
 export default {
   name: "formAdapt",
   // setup() {

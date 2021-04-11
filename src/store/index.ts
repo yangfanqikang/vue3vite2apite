@@ -1,7 +1,7 @@
 import { InjectionKey } from 'vue'
 import { createStore, useStore as baseUseStore, Store } from 'vuex'
 import themeConfig from '/@/utils/themeConfig.ts'
-import { getSession } from "/@/utils/storage.ts";
+import { getSession } from '/@/utils/storage.ts'
 export interface RootStateTypes {
     themeConfig: {
         isDrawer: boolean,
@@ -57,72 +57,72 @@ export interface RootStateTypes {
 export const key: InjectionKey<Store<RootStateTypes>> = Symbol()
 
 export const store = createStore<RootStateTypes>({
-    state: {
-        themeConfig,
-        routes: [],
-        keepAliveNames: [],
-        tagsViewRoutes: [],
-        userInfos: {},
-        requestOldRoutes: []
+  state: {
+    themeConfig,
+    routes: [],
+    keepAliveNames: [],
+    tagsViewRoutes: [],
+    userInfos: {},
+    requestOldRoutes: []
+  },
+  mutations: {
+    // 设置布局配置
+    getThemeConfig(state: any, data: object) {
+      state.themeConfig = Object.assign({}, data)
     },
-    mutations: {
-        // 设置布局配置
-        getThemeConfig(state: any, data: object) {
-            state.themeConfig = Object.assign({}, data)
-        },
-        // 设置路由，菜单中使用到
-        getRoutes(state: any, data: Array<object>) {
-            state.routes = data
-        },
-        // 设置缓存（name字段）
-        getCacheKeepAlive(state: any, data: Array<string>) {
-            state.keepAliveNames = data
-        },
-        // 设置 TagsView 路由
-        getTagsViewRoutes(state: any, data: Array<string>) {
-            state.tagsViewRoutes = data
-        },
-        // 设置用户信息
-        getUserInfos(state: any, data: object) {
-            state.userInfos = data
-        },
-        // 后端控制路由
-        getBackEndControlRoutes(state: any, data: object) {
-            state.requestOldRoutes = data
-        },
+    // 设置路由，菜单中使用到
+    getRoutes(state: any, data: Array<object>) {
+      state.routes = data
     },
-    actions: {
-        // 设置布局配置
-        setThemeConfig({ commit }, data: object) {
-            commit('getThemeConfig', data)
-        },
-        // 设置路由，菜单中使用到
-        async setRoutes({ commit }, data: any) {
-            commit('getRoutes', data)
-        },
-        // 设置缓存（name字段）
-        async setCacheKeepAlive({ commit }, data: Array<string>) {
-            commit('getCacheKeepAlive', data)
-        },
-        // 设置 TagsView 路由
-        async setTagsViewRoutes({ commit }, data: Array<string>) {
-            commit('getTagsViewRoutes', data)
-        },
-        // 设置用户信息
-        async setUserInfos({ commit }, data: object) {
-            if (data) {
-                commit('getUserInfos', data)
-            } else {
-                if (getSession('userInfo')) commit('getUserInfos', getSession('userInfo'))
-            }
-        },
-        // 后端控制路由
-        setBackEndControlRoutes({ commit }, routes: Array<string>) {
-            commit('getBackEndControlRoutes', routes)
-        }
+    // 设置缓存（name字段）
+    getCacheKeepAlive(state: any, data: Array<string>) {
+      state.keepAliveNames = data
+    },
+    // 设置 TagsView 路由
+    getTagsViewRoutes(state: any, data: Array<string>) {
+      state.tagsViewRoutes = data
+    },
+    // 设置用户信息
+    getUserInfos(state: any, data: object) {
+      state.userInfos = data
+    },
+    // 后端控制路由
+    getBackEndControlRoutes(state: any, data: object) {
+      state.requestOldRoutes = data
     }
+  },
+  actions: {
+    // 设置布局配置
+    setThemeConfig({ commit }, data: object) {
+      commit('getThemeConfig', data)
+    },
+    // 设置路由，菜单中使用到
+    async setRoutes({ commit }, data: any) {
+      commit('getRoutes', data)
+    },
+    // 设置缓存（name字段）
+    async setCacheKeepAlive({ commit }, data: Array<string>) {
+      commit('getCacheKeepAlive', data)
+    },
+    // 设置 TagsView 路由
+    async setTagsViewRoutes({ commit }, data: Array<string>) {
+      commit('getTagsViewRoutes', data)
+    },
+    // 设置用户信息
+    async setUserInfos({ commit }, data: object) {
+      if (data) {
+        commit('getUserInfos', data)
+      } else {
+        if (getSession('userInfo')) commit('getUserInfos', getSession('userInfo'))
+      }
+    },
+    // 后端控制路由
+    setBackEndControlRoutes({ commit }, routes: Array<string>) {
+      commit('getBackEndControlRoutes', routes)
+    }
+  }
 })
 
 export function useStore() {
-    return baseUseStore(key)
+  return baseUseStore(key)
 }
