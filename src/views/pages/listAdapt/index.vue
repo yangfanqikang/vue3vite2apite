@@ -2,14 +2,13 @@
   <div class="grid-container" :style="JSONData.styleVars">
     <div class="grid-box" v-for="(item,index) in JSONData.list" :key="item.sort" :style="item.style">
       <div>{{item.componentName}}--{{index}}</div>
-      <span class="resize" ref="resize" @mousedown.stop="e=>handleMouseDown(e,1,item)">▶</span>
-      <span class="vresize" ref="resize" @mousedown.stop="e=>handleMouseDown(e,2,item)">▼</span>
+      <div class="resize" ref="resize" @mousedown.stop="e=>handleMouseDown(e,item)"></div>
     </div>
   </div>
   <pre>{{JSON.stringify(JSONData.list, null, 4)}}</pre>
 </template>
 <script>
-import { ref, reactive, nextTick } from 'vue'
+import { ref, reactive } from 'vue'
 import _ from 'lodash'
 export default {
   name: 'grid-container',
@@ -24,7 +23,8 @@ export default {
         // 默认行高
         '--gridAutoRows': '50px',
         // 默认间距
-        '--gridGap': '1px'
+        '--gridGap': '1px',
+        '--border': '1px solid red'
       },
       list: [
         {
@@ -221,7 +221,6 @@ export default {
         }
       ]
     })
-    const isDown = ref(false)
     const position = reactive({
       startX: 0,
       endX: 0,
@@ -229,40 +228,39 @@ export default {
       endY: 0
     })
     let lock = false
-    const handleMouseDown = (e, type, item) => {
-      // e.target.style.background = 'green'
+    const handleMouseDown = (e, item) => {
+      console.log(e.target.parentElement.getBoundingClientRect())
+      if (e.target.className !== 'resize') return
+      e.target.parentNode.classList.add('isActive')
       lock = false
-      if (type === 1) {
-        position.startX = e.clientX
-        console.log('>>>position.startX', position.startX)
-      } else {
-        position.startY = e.clientY
-        console.log('>>>', position.startY)
-      }
+      position.startX = e.clientX
+      position.startY = e.clientY
+      console.log('>>>position.startX', position.startX)
+      position.startY = e.clientY
+      console.log('>>>', position.startY)
+
       document.onmousemove = (e) => {
         lock = true
-        if (type === 1) {
-          position.endX = e.clientX
-          console.log('endX', position.endX)
-        } else {
-          position.endY = e.clientY
-          console.log('endY', position.endY)
-        }
-        createElementDiv(e, type)
+        position.endX = e.clientX
+        position.endY = e.clientY
+        console.log('endY', position.endY)
+        createElementDiv(e)
       }
+
       document.onmouseup = () => {
         document.onmousemove = null
         document.onmouseup = null
         if (lock) {
+          e.target.parentNode.classList.remove('isActive')
           if (document.querySelector('#_line')) {
             document.body.removeChild(document.querySelector('#_line'))
           }
-          if (type === 1) {
-            // 右侧拖拽
-            const moveLength = position.endX - position.startX
-            if (Math.abs(moveLength) < 10) return
-            console.log('moveLength', moveLength)
-            const moveCount = Math.abs(parseInt(moveLength / 50)) > 0 ? parseInt(moveLength / 50) : (moveLength > 0 ? 1 : -1)
+
+          // 右侧拖拽
+          const moveLengthX = position.endX - position.startX
+          if (Math.abs(moveLengthX) > 15) {
+            console.log('moveLength', moveLengthX)
+            const moveCount = Math.abs(parseInt(moveLengthX / 50)) > 0 ? parseInt(moveLengthX / 50) : (moveLengthX > 0 ? 1 : -1)
             console.log('moveCount', moveCount)
             // 最大12和最小1宽度限制
             const count = item.style.gridColumnEnd.split(' ')[1] * 1 + moveCount
@@ -273,12 +271,12 @@ export default {
             } else {
               item.style.gridColumnEnd = 'span ' + (item.style.gridColumnEnd.split(' ')[1] * 1 + moveCount)
             }
-          } else {
-            const moveLength = position.endY - position.startY
-            if (Math.abs(moveLength) < 15) return
-            // 下侧拖拽
-            console.log('moveLength>>>', moveLength)
-            const moveCount = Math.abs(parseInt(moveLength / 50)) > 0 ? parseInt(moveLength / 50) : (moveLength > 0 ? 1 : -1)
+          }
+          // 右侧拖拽
+          const moveLengthY = position.endY - position.startY
+          if (Math.abs(moveLengthY) > 15) {
+            console.log('moveLength>>>', moveLengthY)
+            const moveCount = Math.abs(parseInt(moveLengthY / 50)) > 0 ? parseInt(moveLengthY / 50) : (moveLengthY > 0 ? 1 : -1)
             console.log('moveCount', moveCount)
             const count = item.style.gridRowEnd.split(' ')[1] * 1 + moveCount
             if (count <= 1) {
@@ -291,24 +289,29 @@ export default {
       }
     }
 
-    const createElementDiv = (e, type) => {
+    const createElementDiv = (e) => {
       if (document.querySelector('#_line')) {
         document.body.removeChild(document.querySelector('#_line'))
       } else {
+        console.log(e)
         const cDiv = document.createElement('div')
-        cDiv.style.position = 'fixed'
-        if (type === 1) {
-          cDiv.style.left = e.clientX + 'px'
-          cDiv.style.top = '0'
-          cDiv.style.height = '100%'
-          cDiv.style.borderRight = '1px dashed green'
-        } else {
-          cDiv.style.top = e.clientY + 'px'
-          cDiv.style.left = '0'
-          cDiv.style.width = '100%'
-          cDiv.style.borderTop = '1px dashed green'
-        }
+        const parentElement = e.target.parentElement
 
+        console.log('>>>parentElement.getBoundingClientRect()', parentElement.getBoundingClientRect())
+        const moveLengthX = position.endX - position.startX
+        const moveLengthY = position.endY - position.startY
+        cDiv.style.position = 'fixed'
+        // cDiv.style.left = e.clientX + 'px'
+        // cDiv.style.top = e.clientY + 'px'
+        // cDiv.style.height = '100px'
+        // cDiv.style.width = '100px'
+        cDiv.style.left = parentElement.getBoundingClientRect().x + 'px'
+        cDiv.style.top = parentElement.getBoundingClientRect().y + 'px'
+        cDiv.style.height = parentElement.getBoundingClientRect().height + moveLengthX + 'px'
+        cDiv.style.width = parentElement.getBoundingClientRect().width + moveLengthY + 'px'
+        cDiv.style.border = '10px dashed green'
+        // cDiv.style.right = '1px dashed green'
+        // cDiv.style.borderTop = '1px dashed green'
         cDiv.style.zIndex = '10'
         cDiv.id = '_line'
         document.body.appendChild(cDiv)
@@ -317,13 +320,15 @@ export default {
 
     return {
       handleMouseDown,
-      isDown,
       JSONData
     }
   }
 }
 </script>
 <style scoped lang="scss">
+.isActive{
+  border: 1px dashed yellowgreen;
+}
 .grid-container {
   width: 865px;
   user-select: none;
@@ -333,18 +338,22 @@ export default {
   // 默认行高50px
   grid-auto-rows: var(--gridAutoRows);
   grid-gap: var(--gridGap);
-  border: 2px solid red;
+  border: var(--border);
   background-color: red;
   >div{
     background-color: #fff;
     position: relative;
     >.resize{
       position: absolute;
-      top: 0;
-      right: 0;
+      bottom: 2px;
+      right: 2px;
+      width: 10px;
+      height: 10px;
+      border-right: 2px solid #999;
+      border-bottom: 2px solid #999;
       &:hover{
         color: red;
-        cursor: w-resize;
+        cursor: nw-resize;
       }
     }
     .vresize{
